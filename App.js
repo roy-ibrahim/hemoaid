@@ -6,10 +6,10 @@ import WelcomeScreen from './src/Screens/WelcomeScreen';
 
 const App = () => {
   return (
-    // <NavigationContainer>
-    //   <TabNavigation />
-    // </NavigationContainer>
-    <WelcomeScreen />
+    <NavigationContainer>
+      <TabNavigation />
+    </NavigationContainer>
+    //<WelcomeScreen />
   );
 };
 
