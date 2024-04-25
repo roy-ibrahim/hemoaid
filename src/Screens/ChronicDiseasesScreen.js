@@ -3,15 +3,37 @@ import {
     Text,
     View,
     TextInput,
+    Button,
+    FlatList,
     TouchableOpacity,
+    ScrollView,
   } from "react-native";
-  import { Picker } from "@react-native-picker/picker";
   import { React, useState } from "react";
   import { useNavigation } from "@react-navigation/native";
+import { RadioButton } from 'react-native-paper';
   
   export default function SignupScreen() {
     const [gender, setGender] = useState(null);
     const navigation = useNavigation();
+
+    const [input, setInput] = useState('');
+  const [results, setResults] = useState([]);
+  const [selected, setSelected] = useState([]);
+
+  const fetchData = async () => {
+    const response = await fetch(`https://clinicaltables.nlm.nih.gov/api/conditions/v3/search?terms=${input}`);
+    const data = await response.json();
+    setResults(data[3]);
+  };
+
+  const handleSelect = (item) => {
+    if (selected.includes(item)) {
+      setSelected(selected.filter(i => i !== item));
+    } else {
+      setSelected([...selected, item]);
+    }
+  };
+
     return (
       <View style={styles.container}>
         <Text style={styles.getStartedText}>Some health info 💊</Text>
@@ -88,56 +110,53 @@ import {
             </Text>
           </View>
         </View>
-        <View style={styles.row}>
-          <TextInput
-            placeholder="Height (CM)"
-            style={[styles.input, styles.halfInput]}
-          />
-          <TextInput
-            placeholder="Weight (KG)"
-            style={[styles.input, styles.halfInputLast]}
-          />
-        </View>
-          <Text style={{fontWeight: "bold"}}>Current Medications</Text>
-        <TextInput
-          placeholder="Medication 1, Medication 2, ..."
-          style={{...styles.input, height: 150}}
-        />
-        <Text style={{fontWeight: "bold"}}>Past Operations</Text>
-        <TextInput
-          placeholder="Operation 1, Operation 2, ..."
-          style={{...styles.input, height: 150}}
-        />
-  
-        <View style={styles.row}>
-          <TouchableOpacity
-            style={{
-              ...styles.input,
-              width: "47%",
-              backgroundColor: "#e8ebf0",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={{ ...styles.buttonText, color: "black" }}>Back</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              ...styles.input,
-              width: "47%",
-              backgroundColor: "#3159f6",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            onPress={() => navigation.navigate("ChronicDiseasesScreen")}
-          >
-            <Text style={styles.buttonText}>Next</Text>
-          </TouchableOpacity>
-        </View>
+        <View>
+      <TextInput
+        value={input}
+        style={styles.input}
+        onChangeText={setInput}
+        placeholder="Search..."
+      />
+      <TouchableOpacity style={styles.button}
+      onPress={fetchData}>
+        <Text style={styles.buttonText}>Search</Text>
+      </TouchableOpacity>
+      <FlatList
+        scrollEnabled
+        style={{
+          backgroundColor: "#e8ebf0",
+          borderRadius: 20,
+          marginVertical: 5,
+          height: "31%",
+          padding: 10,
+        }}
+        data={results}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={{ flexDirection: 'row', alignItems: 'center', padding: 2, bottom: 5, }}>
+            <RadioButton
+              value={item[0]}
+              status={ selected.includes(item[0]) ? 'checked' : 'unchecked' }
+              onPress={() => handleSelect(item[0])}
+            />
+            <Text>{item[0]}</Text>
+          </View>
+        )}
+      />
+      
+    </View>
+    <View style={styles.footer}>
+      <View style={styles.selectedDiseases}>
+        <Text style={{fontWeight: "bold"}}>Selected Diseases:</Text>
+        <Text>{selected.join(', ')}</Text>
       </View>
+      <View style={styles.row}>
+      <TouchableOpacity style={{...styles.halfButton, backgroundColor: "#e8ebf0"}}
+      onPress={()=> navigation.goBack()}><Text style={{...styles.buttonText, color: "black"}}>Back</Text></TouchableOpacity>
+      <TouchableOpacity style={styles.halfButton}><Text style={styles.buttonText}>Finish!</Text></TouchableOpacity>
+      </View>
+      </View>
+    </View>
     );
   }
   
@@ -189,5 +208,47 @@ import {
       fontSize: 25,
       fontWeight: "bold",
     },
+    button:{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 55,
+      backgroundColor: "#3159f6",
+      borderColor: "transparent",
+      borderWidth: 2,
+      paddingHorizontal: 10,
+      borderRadius: 10,
+    },
+    halfButton:{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 55,
+      width: "47.5%",
+      backgroundColor: "#3159f6",
+      borderColor: "transparent",
+      borderWidth: 2,
+      paddingHorizontal: 10,
+      borderRadius: 10,
+    },
+    footer:{
+      position: "absolute",
+      bottom: 50,
+      margin: 20,
+      height: "20%",
+      width: "100%",
+      borderColor: "transparent",
+      borderWidth: 2,
+      borderRadius: 20,
+    },
+    selectedDiseases: {
+      backgroundColor: "#e8ebf0",
+      width: "100%",
+      height: "100%",
+      borderRadius: 20,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      bottom: 10,
+    }
   });
   

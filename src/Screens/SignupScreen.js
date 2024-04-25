@@ -180,7 +180,8 @@ export default function SignupScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        onPress={signUp}//()=> navigation.navigate("PersonalInfoScreen")}
+        //onPress={signUp}
+        onPress={()=> navigation.navigate("PersonalInfoScreen")}
       >
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
