@@ -5,15 +5,20 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  Image,
   StyleSheet,
   KeyboardAvoidingView,
 } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
 const WelcomeScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [borderColor, setBorderColor] = useState("transparent");
+  const [emailborderColor, setemailBorderColor] = useState("transparent");
+  const [passborderColor, setpassBorderColor] = useState("transparent");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigation = useNavigation();
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -21,6 +26,13 @@ const WelcomeScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.welcomeContainer}>  
+      <Image 
+      source={require("../images/logo.jpg")}
+      style={{width: 250, height: 250}} />
+      <Text style={styles.welcomeSentence}>Welcome to <Text style={styles.appName}>HemoAid !</Text></Text>
+      <Text style={styles.smallDesc}>Easily monitor your blood tests, receive personalized insights, and stay on top of your health journey.🩸📊</Text>
+      </View>
       <TouchableOpacity style={styles.getStartedButton} onPress={toggleModal}>
         <Text style={styles.getStartedButtonText}>Get Started</Text>
       </TouchableOpacity>
@@ -38,25 +50,30 @@ const WelcomeScreen = () => {
             <Text style={styles.LoginText}>Login to your account</Text>
             <TextInput
               placeholder="Email"
-              style={{...styles.input, borderColor: borderColor}}
+              style={{...styles.input, borderColor: emailborderColor}}
               onChangeText={(text) => {
                 setEmail(text);
-                setBorderColor("#3159f6");
+                color = text === "" ? "transparent" : "#3159f6";
+                setemailBorderColor(color);
             }
               }
             />
             <TextInput
               placeholder="Password"
               secureTextEntry={true}
-              style={styles.input}
-              onChangeText={(text) => setPassword(text)}
+              style={{...styles.input, borderColor: passborderColor}}
+              onChangeText={(text) => {setPassword(text)
+                color = text === "" ? "transparent" : "#3159f6";
+                setpassBorderColor(color);
+              }}
             />
             <TouchableOpacity style={styles.loginButton}>
               <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
             <View style={styles.signupContainer}>
                 <Text style={{fontWeight: "bold", fontSize: 15,}}>Don't have an account?</Text>
-                <TouchableOpacity style={styles.registerNowButton}>
+                <TouchableOpacity style={styles.registerNowButton}
+                onPress={()=> navigation.navigate("SignupScreen")}>
                     <Text style={{color: "#3159f6", fontWeight: "bold",}}>Register now</Text>
                 </TouchableOpacity>
             </View>
@@ -73,7 +90,29 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    margin: 20,
+    padding: 20,
+    backgroundColor: "white"
+  },
+  welcomeSentence: {
+    fontSize: 30,
+    fontWeight: "bold",
+  },
+  welcomeContainer:{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    bottom: 30,
+  },
+  appName: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#3159f6",
+  },
+  smallDesc: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    top: 10,
   },
   getStartedButton: {
     display: "flex",
@@ -82,7 +121,7 @@ const styles = StyleSheet.create({
     width: "95%",
     height: "8%",
     position: "absolute",
-    bottom: 10,
+    bottom: 20,
     backgroundColor: "#3159f6",
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -115,7 +154,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   LoginText:{
-    fontSize: 30,
+    fontSize: 40,
     fontWeight: "bold",
     color: "black",
     marginBottom: 20,
