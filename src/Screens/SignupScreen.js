@@ -18,14 +18,12 @@ export default function SignupScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
-
-  const signUp = async (email, password) => {
-    try {
-      // Create a new user
-      createUserWithEmailAndPassword(auth, email, password);
   
-      // // Get the current user
-      const currentUser = auth.currentUser;
+  const signUp = async () => {
+    try {
+      console.log('YOO:',email, password)
+      // Create a new user
+      createUserWithEmailAndPassword(email, password);
   
       console.log('User signed up successfully!');
     } catch (error) {
@@ -180,8 +178,8 @@ export default function SignupScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        //onPress={signUp}
-        onPress={()=> navigation.navigate("PersonalInfoScreen")}
+        onPress={signUp}
+        //onPress={()=> navigation.navigate("PersonalInfoScreen")}
       >
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>

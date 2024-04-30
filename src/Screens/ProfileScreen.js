@@ -10,8 +10,12 @@ import {
 } from "react-native";
 import React from "react";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useNavigation } from "@react-navigation/native";
 
 export default function ProfileScreen() {
+
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView
       style={{ ...styles.container, paddingTop: StatusBar.currentHeight + 10 }}
@@ -40,6 +44,7 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>Account</Text>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#e8ebf0" }]}
+            onPress={() => navigation.navigate("EditPersonalInfoScreen")}
           >
             <Icon name="user" size={20} color="#3159f6" />
             <Text style={styles.buttonText}>Edit personal info</Text>
