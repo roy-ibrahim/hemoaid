@@ -11,6 +11,7 @@ import {
 import React from "react";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from "@react-navigation/native";
+import EditPersonalInfoScreen from "./EditPersonalInfoScreen";
 
 export default function ProfileScreen() {
 

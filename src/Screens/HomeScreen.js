@@ -71,7 +71,6 @@ export default function HomeScreen() {
           borderRadius: 20,
         }}
       />
-      <Text style={styles.AddTestText}>Got any questions?</Text>
     </ScrollView>
   );
 }

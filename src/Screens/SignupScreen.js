@@ -3,6 +3,7 @@ import {
   Text,
   View,
   TextInput,
+  ScrollView,
   TouchableOpacity,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -10,29 +11,48 @@ import { React, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 //import auth from "../config/firebase";
 import { auth, db } from "../config/firebase";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+import {createUserWithEmailAndPassword } from "firebase/auth";
+import { addDoc, collection, setDoc, doc } from "firebase/firestore";
 
 export default function SignupScreen() {
-  const [gender, setGender] = useState(null);
+  const [gender, setGender] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
   
-  const signUp = async () => {
+  const userSignUp = async () => {
+    let userId = "";
     try {
-      console.log('YOO:',email, password)
-      // Create a new user
-      createUserWithEmailAndPassword(email, password);
-  
-      console.log('User signed up successfully!');
-    } catch (error) {
-      console.error('Error signing up: ', error);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      userId = userCredential.user.uid;
+    } catch(error) {
+      console.log(error.message);
     }
-  };
+    try{
+      await setDoc(doc(db, "users", userId), {
+        firstName,
+        lastName,
+        phoneNumber,
+        gender,
+        dateOfBirth,
+      });
+      console.log("adding info success");
+    }
+   catch (error) {
+    console.error('Error adding info ', error);
+  }
+  //navigation.navigate('PersonalInfoScreen');
+  }
+
 
   return (
     <View style={styles.container}>
+        
+      <ScrollView>
       <Text style={styles.getStartedText}>Let's get you started👏</Text>
       <View
         style={{
@@ -112,10 +132,14 @@ export default function SignupScreen() {
       <View style={styles.row}>
         <TextInput
           placeholder="First Name"
+          value={firstName}
+          onChangeText={(text)=>setFirstName(text)}
           style={[styles.input, styles.halfInput]}
         />
         <TextInput
           placeholder="Last Name"
+          value={lastName}
+          onChangeText={(text)=>setLastName(text)}
           style={[styles.input, styles.halfInputLast]}
         />
       </View>
@@ -135,6 +159,8 @@ export default function SignupScreen() {
         </Text>
         <TextInput
           placeholder="Phone Number"
+          value={phoneNumber}
+          onChangeText={(int) => setPhoneNumber(int)}
           maxLength={8}
           keyboardType="numeric"
         />
@@ -143,6 +169,8 @@ export default function SignupScreen() {
       <View style={styles.row}>
         <TextInput
           placeholder="Date of Birth"
+          value={dateOfBirth}
+          onChangeText={(text)=>setDateOfBirth(text)}
           style={[styles.input, styles.halfInput]}
         />
         <View style={styles.pickerContainer}>
@@ -178,12 +206,14 @@ export default function SignupScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        onPress={signUp}
-        //onPress={()=> navigation.navigate("PersonalInfoScreen")}
+        //onPress={userSignUp}
+        onPress={()=> navigation.navigate("PersonalInfoScreen")}
       >
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
-    </View>
+    
+      </ScrollView>
+        </View>
   );
 }
 

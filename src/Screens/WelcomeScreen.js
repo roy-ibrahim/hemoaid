@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
 
 const WelcomeScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,6 +25,14 @@ const WelcomeScreen = () => {
   const toggleModal = () => {
     setModalVisible(!modalVisible);
   };
+
+  const userSignIn = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch(error) {
+      console.log(error.message);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -51,6 +61,7 @@ const WelcomeScreen = () => {
             <TextInput
               placeholder="Email"
               style={{...styles.input, borderColor: emailborderColor}}
+              value={email}
               onChangeText={(text) => {
                 setEmail(text);
                 color = text === "" ? "transparent" : "#3159f6";
@@ -61,13 +72,15 @@ const WelcomeScreen = () => {
             <TextInput
               placeholder="Password"
               secureTextEntry={true}
+              value={password}
               style={{...styles.input, borderColor: passborderColor}}
               onChangeText={(text) => {setPassword(text)
                 color = text === "" ? "transparent" : "#3159f6";
                 setpassBorderColor(color);
               }}
             />
-            <TouchableOpacity style={styles.loginButton}>
+            <TouchableOpacity style={styles.loginButton}
+            onPress={userSignIn}>
               <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
             <View style={styles.signupContainer}>

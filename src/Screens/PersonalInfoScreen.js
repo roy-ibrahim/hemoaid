@@ -4,16 +4,23 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  ScrollView
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { React, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 export default function SignupScreen() {
-  const [gender, setGender] = useState(null);
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [currentMedications, setCurrentMedications] = useState("no medication");
+  const [pastOperations, setPastOperations] = useState("no past operations");
   const navigation = useNavigation();
+  
   return (
     <View style={styles.container}>
+      <ScrollView>
+
       <Text style={styles.getStartedText}>Some health info 💊</Text>
       <View
         style={{
@@ -92,21 +99,29 @@ export default function SignupScreen() {
       <View style={styles.row}>
         <TextInput
           placeholder="Height (CM)"
+          value={height}
+          onChangeText={(text)=>setHeight(text)}
           style={[styles.input, styles.halfInput]}
         />
         <TextInput
           placeholder="Weight (KG)"
+          value={weight}
+          onChangeText={(text)=>setWeight(text)}
           style={[styles.input, styles.halfInputLast]}
         />
       </View>
         <Text style={{fontWeight: "bold"}}>Current Medications</Text>
       <TextInput
         placeholder="Medication 1, Medication 2, ..."
+        value={currentMedications}
+        onChangeText={(text)=>setCurrentMedications(text)}
         style={{...styles.input, height: 150}}
       />
       <Text style={{fontWeight: "bold"}}>Past Operations</Text>
       <TextInput
         placeholder="Operation 1, Operation 2, ..."
+        value={pastOperations}
+        onChangeText={(text)=>setPastOperations(text)}
         style={{...styles.input, height: 150}}
       />
 
@@ -138,6 +153,7 @@ export default function SignupScreen() {
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </View>
   );
 }
