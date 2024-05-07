@@ -9,9 +9,9 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { React, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import {createUserWithEmailAndPassword } from "firebase/auth";
 //import auth from "../config/firebase";
 import { auth, db } from "../config/firebase";
-import {createUserWithEmailAndPassword } from "firebase/auth";
 import { addDoc, collection, setDoc, doc } from "firebase/firestore";
 
 export default function SignupScreen() {
@@ -36,6 +36,7 @@ export default function SignupScreen() {
       await setDoc(doc(db, "users", userId), {
         firstName,
         lastName,
+        email,
         phoneNumber,
         gender,
         dateOfBirth,
@@ -45,7 +46,9 @@ export default function SignupScreen() {
    catch (error) {
     console.error('Error adding info ', error);
   }
-  //navigation.navigate('PersonalInfoScreen');
+  navigation.navigate('PersonalInfoScreen', {
+    userid: userId
+  });
   }
 
 
@@ -206,8 +209,8 @@ export default function SignupScreen() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        //onPress={userSignUp}
-        onPress={()=> navigation.navigate("PersonalInfoScreen")}
+        onPress={userSignUp}
+        //onPress={()=> navigation.navigate("PersonalInfoScreen")}
       >
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>

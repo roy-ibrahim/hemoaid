@@ -27,11 +27,15 @@ const WelcomeScreen = () => {
   };
 
   const userSignIn = async () => {
+    let userid = "";
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      userid = userCredential.user.uid;
+      console.log("signin successful");
     } catch(error) {
       console.log(error.message);
     }
+    navigation.navigate("Home", {userid: userid})
   }
 
   return (

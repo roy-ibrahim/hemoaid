@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as GoogleGenerativeAI from "@google/generative-ai";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { auth, db } from "../config/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 import {
   View,
@@ -13,9 +14,29 @@ import {
 } from "react-native";
 
 const GeminiChat = () => {
+  const userid = auth.currentUser.uid;
+  const [userData, setUserData] = useState({});
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const docRef = doc(db, "users", userid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+        console.log(
+          `The patient is a ${userData.dateOfBirth}-year-old with a history of ${userData.chronicDiseases}. They are currently taking ${userData.currentMedications}. Their height is ${userData.height} cm and weight is ${userData.weight} kg. Past operations include ${userData.pastOperations}. take this into consideration before answering any question`
+        );
+      } else {
+        console.log("No document found");
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const API_KEY = "AIzaSyDMgSJdGzmNz7gAzO2jTTIZEIekXuwSuK0";
 
@@ -23,7 +44,7 @@ const GeminiChat = () => {
     const startChat = async () => {
       const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const prompt = "hello! ";
+      const prompt = `You are named HemoAid, the medical helper, you answer medical questions`;
       const result = await model.generateContent(prompt);
       const response = result.response;
       const text = response.text();
@@ -78,6 +99,31 @@ const GeminiChat = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={{
+          marginBottom: 5,
+          height: 30,
+          padding: 5,
+          backgroundColor: "red",
+          width: "60%",
+          backgroundColor: "#e8ebf0",
+          alignSelf: "center",
+          borderRadius: 50,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        onPress={()=> setUserInput(`I am ${userData.dateOfBirth}-year-old with a history of ${userData.chronicDiseases}. I am currently taking ${userData.currentMedications}. My height is ${userData.height} cm and weight is ${userData.weight} kg. Past operations include ${userData.pastOperations}`)}
+      >
+        <Text
+          style={{
+            color: "black",
+            fontSize: 13,
+            fontWeight: "bold",
+          }}
+        >
+          Tell HemoAid about myself
+        </Text>
+      </TouchableOpacity>
       <FlatList
         data={messages}
         renderItem={renderMessage}

@@ -6,17 +6,35 @@ import {
   TouchableOpacity,
   ScrollView
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { React, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { auth, db } from "../config/firebase";
+import { addDoc, collection, setDoc, doc } from "firebase/firestore";
 
-export default function SignupScreen() {
+export default function SignupScreen({route}) {
+  const {userid} = route.params;
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [currentMedications, setCurrentMedications] = useState("no medication");
   const [pastOperations, setPastOperations] = useState("no past operations");
   const navigation = useNavigation();
   
+  const handleHealthInfo = async() => {
+    try{
+      await setDoc(doc(db, "users", userid), {
+        height,
+        weight,
+        currentMedications,
+        pastOperations,
+      },{merge: true});
+      console.log("adding info success");
+    }
+   catch (error) {
+    console.error('Error adding info ', error);
+  }
+  navigation.navigate("ChronicDiseasesScreen", {userid});
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -148,7 +166,8 @@ export default function SignupScreen() {
             justifyContent: "center",
             alignItems: "center",
           }}
-          onPress={() => navigation.navigate("ChronicDiseasesScreen")}
+          //onPress={() => navigation.navigate("ChronicDiseasesScreen")}
+          onPress={handleHealthInfo}
         >
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>

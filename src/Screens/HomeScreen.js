@@ -7,11 +7,32 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "react-native";
 import { LineChart } from "react-native-chart-kit";
+import { auth, db } from "../config/firebase";
+import {doc, getDoc} from "firebase/firestore"
 
 export default function HomeScreen() {
+  const userid = auth.currentUser.uid;
+  const [userData, setUserData] = useState({})
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const docRef = doc(db, "users", userid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+        console.log(userData.firstName);
+      } else {
+        console.log("No document found");
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const data = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
     datasets: [
@@ -44,9 +65,10 @@ export default function HomeScreen() {
       style={{ ...styles.container, paddingTop: StatusBar.currentHeight + 10 }}
     >
       <View>
-        <Text style={styles.welcomeText}>Hi Roy! 👋</Text>
+        <Text style={styles.welcomeText}>Hi {userData.firstName}! 👋</Text>
       </View>
-      <TouchableOpacity style={styles.addBloodTestButton}>
+      <TouchableOpacity style={styles.addBloodTestButton}
+      onPress={()=> console.log(userid)}>
         <Text style={styles.AddTestText}>Add your blood test now!</Text>
         <ImageBackground
           source={require("../images/image1.png")}

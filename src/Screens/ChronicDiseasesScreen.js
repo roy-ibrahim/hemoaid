@@ -3,23 +3,34 @@ import {
   Text,
   View,
   TextInput,
-  Button,
   FlatList,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
 } from "react-native";
 import { React, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { RadioButton } from "react-native-paper";
+import { auth, db } from "../config/firebase";
+import { addDoc, collection, setDoc, doc } from "firebase/firestore";
 
-export default function SignupScreen() {
+export default function SignupScreen({route}) {
   const [gender, setGender] = useState(null);
   const navigation = useNavigation();
-
+  const {userid} = route.params;
   const [input, setInput] = useState("");
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState([]);
+  //{selected.join(", ")}
+  const handleChronicDiseases = async() => {
+    try{
+      await setDoc(doc(db, "users", userid), {
+        chronicDiseases: selected.join(", "),
+      },{merge: true});
+      console.log("adding info success");
+    }
+   catch (error) {
+    console.error('Error adding info ', error);
+  }
+  }
 
   const fetchData = async () => {
     const response = await fetch(
@@ -165,7 +176,8 @@ export default function SignupScreen() {
           >
             <Text style={{ ...styles.buttonText, color: "black" }}>Back</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.halfButton}>
+          <TouchableOpacity style={styles.halfButton}
+          onPress={handleChronicDiseases}>
             <Text style={styles.buttonText}>Finish!</Text>
           </TouchableOpacity>
         </View>

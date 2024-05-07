@@ -11,10 +11,29 @@ import {
 import React from "react";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from "@react-navigation/native";
-import EditPersonalInfoScreen from "./EditPersonalInfoScreen";
+import { useState, useEffect } from "react";
+import { auth, db } from "../config/firebase";
+import {doc, getDoc} from "firebase/firestore"
 
 export default function ProfileScreen() {
+  const userid = auth.currentUser.uid;
+  const [userData, setUserData] = useState({})
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const docRef = doc(db, "users", userid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+        console.log(userData.firstName);
+      } else {
+        console.log("No document found");
+      }
+    };
+
+    fetchUserData();
+  }, []);
   const navigation = useNavigation();
 
   return (
@@ -33,10 +52,10 @@ export default function ProfileScreen() {
         }}
       ></Image>
       <View style={{marginLeft: 10}}>
-        <Text style={styles.name}>Roy Ibrahim</Text>
-        <Text style={styles.smalltext}>Gender: Male</Text>
+        <Text style={styles.name}>{userData.firstName} {userData.lastName}</Text>
+        <Text style={styles.smalltext}>Gender: {userData.gender}</Text>
         <Text style={styles.smalltext}>Age: 23</Text>
-        <Text style={styles.smalltext}>Height: 185cm | Weight: 56kg</Text>
+        <Text style={styles.smalltext}>Height: {userData.height}cm | Weight: {userData.weight}kg</Text>
       </View>
       </View>
 

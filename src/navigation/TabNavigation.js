@@ -6,9 +6,11 @@ import HomeScreen from "../Screens/HomeScreen";
 import ChatbotScreen from "../Screens/ChatBotScreen";
 import ProfileScreen from "../Screens/ProfileScreen";
 
+
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
