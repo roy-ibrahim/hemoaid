@@ -1,43 +1,58 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-
-const person = {
-  name: 'John Doe',
-  age: 30,
-  height: '170 cm',
-  weight: '70 kg',
-  gender: 'Male',
-  pastOperations: ['Operation 1', 'Operation 2'],
-  currentMedications: ['Medication 1', 'Medication 2'],
-  chronicDiseases: ['Disease 1', 'Disease 2'],
-};
+import { View, Text, StyleSheet, Share, Touchable, TouchableOpacity } from 'react-native';
+import { useState, useEffect } from 'react';
+import { auth, db } from "../config/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const HealthSummaryScreen = () => {
+  const userid = auth.currentUser.uid;
+  const [userData, setUserData] = useState({});
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const docRef = doc(db, "users", userid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+        console.log(userData.firstName);
+      } else {
+        console.log("No document found");
+      }
+    };
+
+    fetchUserData();
+  }, []);
   return (
     <View style={styles.container}>
-      <Text style={styles.name}>{person.name}</Text>
-      <Text style={styles.info}>Age: {person.age}</Text>
-      <Text style={styles.info}>Height: {person.height}</Text>
-      <Text style={styles.info}>Weight: {person.weight}</Text>
-      <Text style={styles.info}>Gender: {person.gender}</Text>
+      <Text style={styles.name}>{userData.firstName} {userData.lastName}</Text>
+      <Text style={styles.info}>Age: {userData.dateOfBirth}</Text>
+      <Text style={styles.info}>Height: {userData.height}</Text>
+      <Text style={styles.info}>Weight: {userData.weight}</Text>
+      <Text style={styles.info}>Gender: {userData.gender}</Text>
       <Text style={styles.title}>Past Operations:</Text>
       <Text style={styles.list}>
-        {person.pastOperations.map((operation, index) => (
-          <Text key={index}>{operation}, </Text>
-        ))}
+        {userData.pastOperations}
       </Text>
       <Text style={styles.title}>Current Medications:</Text>
-      <Text style={styles.list}>
-        {person.currentMedications.map((medication, index) => (
-          <Text key={index}>{medication}, </Text>
-        ))}
+      <Text style={styles.list}>{userData.currentMedications}
       </Text>
       <Text style={styles.title}>Chronic Diseases:</Text>
-      <Text style={styles.list}>
-        {person.chronicDiseases.map((disease, index) => (
-          <Text key={index}>{disease}, </Text>
-        ))}
+      <Text style={styles.list}>{userData.chronicDiseases}
       </Text>
+      <TouchableOpacity
+      onPress={()=> Share.share({
+        message: `Name: ${userData.firstName} ${userData.lastName}` +
+        `\nAge: ${userData.dateOfBirth}` +
+        `\nGender: ${userData.gender}` +
+        `\nHeight: ${userData.height} cm` +
+        `\nWeight: ${userData.weight} kg` +
+        `\nChronic Diseases: ${userData.chronicDiseases}` +
+        `\nCurrent Medications: ${userData.currentMedications}` +
+        `\nPast Operations: ${userData.pastOperations}`,
+      })}>
+        <Text style={{fontSize: 20, fontWeight: "bold", color: "#3159f6", textAlign: "center", top :40}}>Tell the Dr about me</Text>
+
+      </TouchableOpacity>
     </View>
   );
 };

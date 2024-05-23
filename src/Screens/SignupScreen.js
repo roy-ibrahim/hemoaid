@@ -15,7 +15,7 @@ import { auth, db } from "../config/firebase";
 import { addDoc, collection, setDoc, doc } from "firebase/firestore";
 
 export default function SignupScreen() {
-  const [gender, setGender] = useState("");
+  const [gender, setGender] = useState("male");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -83,7 +83,7 @@ export default function SignupScreen() {
         </View>
         <View
           style={{
-            width: "30%",
+            width: "28%",
             borderWidth: 2,
             height: 1,
             margin: 4,
@@ -108,7 +108,7 @@ export default function SignupScreen() {
         </View>
         <View
           style={{
-            width: "30%",
+            width: "28%",
             borderWidth: 2,
             height: 1,
             margin: 4,
@@ -171,7 +171,7 @@ export default function SignupScreen() {
 
       <View style={styles.row}>
         <TextInput
-          placeholder="Date of Birth"
+          placeholder="Age"
           value={dateOfBirth}
           onChangeText={(text)=>setDateOfBirth(text)}
           style={[styles.input, styles.halfInput]}

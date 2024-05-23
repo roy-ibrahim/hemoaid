@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import TabNavigation from './src/navigation/TabNavigation';
@@ -8,6 +7,7 @@ import { firebase } from 'firebase/auth';
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from "./src/config/firebase";
+import EditPersonalInfoScreen from './src/Screens/EditPersonalInfoScreen';
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -26,9 +26,11 @@ const App = () => {
       ) : (
         <StackNavigation />
       )}
+
     </NavigationContainer>
     //<WelcomeScreen />
   );
 };
 
 export default App;
+

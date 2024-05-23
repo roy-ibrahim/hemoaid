@@ -1,31 +1,58 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput } from 'react-native'
 import React from 'react'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { auth, db } from "../config/firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export default function EditPersonalInfoScreen() {
-  const [firstName, setFirstName] = useState('John');
-  const [lastName, setLastName] = useState('Doe');
-  const [email, setEmail] = useState('john.doe@example.com');
-  const [password, setPassword] = useState('password123');
+  const userid = auth.currentUser.uid;
+  const [userData, setUserData] = useState({});
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleEdit = () => {
-    // Show the keyboard and allow the user to edit the fields
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const docRef = doc(db, "users", userid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+        console.log(userData.firstName);
+      } else {
+        console.log("No document found");
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleEdit = async() => {
+    try{
+      await updateDoc(doc(db, "users", userid), {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+      });
+      console.log("adding info success");
+    }
+   catch (error) {
+    console.error('Error adding info ', error);
+  }
   };
 
-  const handleSave = () => {
-    // Save the user data to the backend or local storage
-  };
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={handleEdit} style={styles.editButton}>
+    <ScrollView style={styles.container}>
+      <TouchableOpacity style={styles.editButton}>
         <Text style={{fontSize: 30, fontWeight: "bold"}}>Edit</Text>
       </TouchableOpacity>
       <View style={styles.inputView}>
         <Text>First Name:</Text>
         <TextInput
           style={styles.input}
+          value={userData.firstName}
           onChangeText={text => setFirstName(text)}
-          value={firstName}
         />
       </View>
       <View style={styles.inputView}>
@@ -33,30 +60,57 @@ export default function EditPersonalInfoScreen() {
         <TextInput
           style={styles.input}
           onChangeText={text => setLastName(text)}
-          value={lastName}
+          value={userData.lastName}
         />
       </View>
       <View style={styles.inputView}>
-        <Text>Email:</Text>
+        <Text>Age:</Text>
         <TextInput
           style={styles.input}
           onChangeText={text => setEmail(text)}
-          value={email}
+          value={userData.dateOfBirth}
         />
       </View>
       <View style={styles.inputView}>
-        <Text>Password:</Text>
+        <Text>height (cm):</Text>
         <TextInput
           style={styles.input}
-          onChangeText={text => setPassword(text)}
-          value={password}
-          secureTextEntry
+          value={userData.height}
         />
       </View>
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+      <View style={styles.inputView}>
+        <Text>weight (kg):</Text>
+        <TextInput
+          style={styles.input}
+          value={userData.weight}
+        />
+      </View>
+      <View style={styles.inputView}>
+        <Text>Chronic Diseases: </Text>
+        <TextInput
+          style={styles.input}
+          value={userData.chronicDiseases}
+        />
+      </View>
+      <View style={styles.inputView}>
+        <Text>Past operations:</Text>
+        <TextInput
+          style={styles.input}
+          value={userData.pastOperations}
+        />
+      </View>
+      <View style={styles.inputView}>
+        <Text>Current medications:</Text>
+        <TextInput
+          style={styles.input}
+          value={userData.currentMedications}
+        />
+      </View>
+      <TouchableOpacity style={styles.saveButton} onPress={handleEdit}>
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
-    </View>
+      <View style={{height: 50}}></View>
+    </ScrollView>
   )
 }
 

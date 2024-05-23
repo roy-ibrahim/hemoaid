@@ -1,23 +1,49 @@
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
   View,
   ScrollView,
   SafeAreaView,
+  Linking,
   Image,
   StatusBar,
-  TouchableOpacity
+  TouchableOpacity,
+  Modal,
 } from "react-native";
-import React from "react";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from "@react-navigation/native";
-import { useState, useEffect } from "react";
 import { auth, db } from "../config/firebase";
-import {doc, getDoc} from "firebase/firestore"
+import { doc, getDoc } from "firebase/firestore";
+import EditPersonalInfoScreen from "./EditPersonalInfoScreen";
+import ViewBloodTestsScreen from "./ViewBloodTestsScreen";
+import HealthSummaryScreen from "./HealthSummaryScreen";
 
 export default function ProfileScreen() {
   const userid = auth.currentUser.uid;
-  const [userData, setUserData] = useState({})
+  const [userData, setUserData] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
+
+    const handleCall = () => {
+      const phoneNumber = '+96179197142';
+      Linking.openURL(`tel:${phoneNumber}`);
+    };
+
+  const handlePers = () => {
+    setModalContent(<EditPersonalInfoScreen userid={userid}/>);
+    setModalVisible(true);
+  };
+
+  const handleBloodTests = () => {
+    setModalContent(<ViewBloodTestsScreen />);
+    setModalVisible(true);
+  };
+
+  const handleHealthSummary = () => {
+    setModalContent(<HealthSummaryScreen />);
+    setModalVisible(true);
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -34,29 +60,30 @@ export default function ProfileScreen() {
 
     fetchUserData();
   }, []);
+
   const navigation = useNavigation();
 
   return (
     <SafeAreaView
       style={{ ...styles.container, paddingTop: StatusBar.currentHeight + 10 }}
     >
-      <View style={{flexDirection: "row"}}>
-      <Image
-        source={require("../images/profileImage.jpg")}
-        style={{
-          width: 110,
-          height: 110,
-          borderRadius: 200,
-          borderColor: "#3159f6",
-          borderWidth: 3,
-        }}
-      ></Image>
-      <View style={{marginLeft: 10}}>
-        <Text style={styles.name}>{userData.firstName} {userData.lastName}</Text>
-        <Text style={styles.smalltext}>Gender: {userData.gender}</Text>
-        <Text style={styles.smalltext}>Age: 23</Text>
-        <Text style={styles.smalltext}>Height: {userData.height}cm | Weight: {userData.weight}kg</Text>
-      </View>
+      <View style={{ flexDirection: "row" }}>
+        <Image
+          source={require("../images/profileImage.jpg")}
+          style={{
+            width: 110,
+            height: 110,
+            borderRadius: 200,
+            borderColor: "#3159f6",
+            borderWidth: 3,
+          }}
+        ></Image>
+        <View style={{ marginLeft: 10 }}>
+          <Text style={styles.name}>{userData.firstName} {userData.lastName}</Text>
+          <Text style={styles.smalltext}>Gender: {userData.gender}</Text>
+          <Text style={styles.smalltext}>Age: 23</Text>
+          <Text style={styles.smalltext}>Height: {userData.height}cm | Weight: {userData.weight}kg</Text>
+        </View>
       </View>
 
       <View style={styles.secondcontainer}>
@@ -64,7 +91,7 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>Account</Text>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#e8ebf0" }]}
-            onPress={() => navigation.navigate("EditPersonalInfoScreen")}
+            onPress={handlePers}
           >
             <Icon name="user" size={20} color="#3159f6" />
             <Text style={styles.buttonText}>Edit personal info</Text>
@@ -80,12 +107,7 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>Health</Text>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#e8ebf0" }]}
-          >
-            <Icon name="medkit" size={20} color="#3159f6" />
-            <Text style={styles.buttonText}>View blood tests</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: "#e8ebf0" }]}
+            onPress={handleHealthSummary}
           >
             <Icon name="list" size={20} color="#3159f6" />
             <Text style={styles.buttonText}>Health summary</Text>
@@ -95,24 +117,41 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>About</Text>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#e8ebf0" }]}
+            onPress={()=> Linking.openURL("https://hemoaid.com")}
           >
             <Icon name="info-circle" size={20} color="#3159f6" />
             <Text style={styles.buttonText}>About us</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#e8ebf0" }]}
-          >
-            <Icon name="question-circle" size={20} color="#3159f6" />
-            <Text style={styles.buttonText}>Help</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: "#e8ebf0" }]}
+            onPress={handleCall}
           >
             <Icon name="phone" size={20} color="#3159f6" />
             <Text style={styles.buttonText}>Contact us</Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+            {modalContent}
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -123,7 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
   },
-  name:{
+  name: {
     fontSize: 25,
     fontWeight: "bold",
     color: "#3159f6",
@@ -136,7 +175,6 @@ const styles = StyleSheet.create({
   },
   smalltext: {
     fontWeight: "bold",
-
   },
   section: {
     marginBottom: 10,
@@ -160,5 +198,26 @@ const styles = StyleSheet.create({
     color: "#555",
     marginLeft: 10,
     color: "black",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    height: "100%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "black"
   },
 });

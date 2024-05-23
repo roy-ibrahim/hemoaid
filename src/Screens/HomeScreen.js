@@ -1,21 +1,42 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  ScrollView,
-  ImageBackground,
-  TouchableOpacity,
-} from "react-native";
 import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, ImageBackground, TouchableOpacity, Modal } from "react-native";
 import { StatusBar } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { auth, db } from "../config/firebase";
-import {doc, getDoc} from "firebase/firestore"
+import { doc, getDoc } from "firebase/firestore";
+import AddBloodTestScreen from "./AddBloodTestScreen";
 
 export default function HomeScreen() {
   const userid = auth.currentUser.uid;
-  const [userData, setUserData] = useState({})
+  const [data1, setData1] = useState(null);
+  const [error, setError] = useState(null);
+  const [userData, setUserData] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const fetchData1 = async () => {
+    setError(null); // Reset the error state before making a new request
+
+    try {
+      const response = await fetch('https://api.api-ninjas.com/v1/quotes?category=medical', {
+        headers: {
+          'X-Api-Key': 'EBeSmF6XhC6UJcgIBr268g==hdmrIBB6pgJs3t1d',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      setData1(result);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchData1();
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -33,42 +54,18 @@ export default function HomeScreen() {
     fetchUserData();
   }, []);
 
-  const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
-    datasets: [
-      {
-        data: [20, 45, 28, 80, 99, 43, 67, 40, 35, 76, 60, 49],
-        color: (opacity = 1) => `rgba(1, 1, 246, ${opacity})`, // optional
-        strokeWidth: 3, // optional
-      },
-    ],
-  };
-
-  const chartConfig = {
-    backgroundColor: "#1cc910",
-    backgroundGradientFrom: "#e8ebf0",
-    backgroundGradientTo: "#e8ebf0",
-    decimalPlaces: 2, // optional, defaults to 2
-    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    labelColor: (opacity = 0) => `rgba(0, 0, 0, ${opacity})`,
-    style: {
-      borderRadius: 16,
-    },
-    propsForDots: {
-      r: "6",
-      strokeWidth: "2",
-    },
-  };
-
   return (
-    <ScrollView
-      style={{ ...styles.container, paddingTop: StatusBar.currentHeight + 10 }}
-    >
+    <ScrollView style={{ ...styles.container, paddingTop: StatusBar.currentHeight + 10}}>
       <View>
         <Text style={styles.welcomeText}>Hi {userData.firstName}! 👋</Text>
       </View>
-      <TouchableOpacity style={styles.addBloodTestButton}
-      onPress={()=> console.log(userid)}>
+      <View style={{...styles.addBloodTestButton, backgroundColor: "black"}}>
+        <Text style={{color: "white", fontSize: 20, marginBottom: 10, fontWeight: "bold"}}>Quote of the day:</Text>
+        {data1 && data1.map((quote, index) => (
+            <Text key={index} style={{color: "white", fontStyle: "italic", fontSize: 13}}>"{quote.quote}"  --  {quote.author}</Text>
+          ))}
+      </View>
+      <TouchableOpacity style={styles.addBloodTestButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.AddTestText}>Add your blood test now!</Text>
         <ImageBackground
           source={require("../images/image1.png")}
@@ -81,18 +78,13 @@ export default function HomeScreen() {
           }}
         ></ImageBackground>
       </TouchableOpacity>
-      <Text style={styles.AddTestText}>Track your progress</Text>
-      <LineChart
-        data={data}
-        width={320}
-        height={200}
-        chartConfig={chartConfig}
-        bezier
-        style={{
-          marginVertical: 10,
-          borderRadius: 20,
-        }}
-      />
+      <View style={{height: 60}}></View>
+      <Modal visible={modalVisible} animationType="slide"
+      onRequestClose={() => {
+        setModalVisible(false);
+      }}>
+        <AddBloodTestScreen onClose={() => setModalVisible(false)} />
+      </Modal>
     </ScrollView>
   );
 }

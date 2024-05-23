@@ -5,6 +5,7 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { React, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -49,7 +50,10 @@ export default function SignupScreen({route}) {
   };
 
   return (
+    <>
+
     <View style={styles.container}>
+
       <Text style={styles.getStartedText}>Any severe problem?🩸</Text>
       <View
         style={{
@@ -171,7 +175,7 @@ export default function SignupScreen({route}) {
         </View>
         <View style={styles.row}>
           <TouchableOpacity
-            style={{ ...styles.halfButton, backgroundColor: "#e8ebf0" }}
+            style={{ ...styles.halfButton, backgroundColor: "#e8ebf0", marginRight:10 }}
             onPress={() => navigation.goBack()}
           >
             <Text style={{ ...styles.buttonText, color: "black" }}>Back</Text>
@@ -183,6 +187,7 @@ export default function SignupScreen({route}) {
         </View>
       </View>
     </View>
+    </>
   );
 }
 
@@ -258,9 +263,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   footer: {
-    position: "absolute",
-    bottom: 50,
-    margin: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    top: 30,
     height: "20%",
     width: "100%",
     borderColor: "transparent",
@@ -270,7 +275,7 @@ const styles = StyleSheet.create({
   selectedDiseases: {
     backgroundColor: "#e8ebf0",
     width: "100%",
-    height: "100%",
+    height: "90%",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,

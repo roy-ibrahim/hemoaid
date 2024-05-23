@@ -35,7 +35,6 @@ const WelcomeScreen = () => {
     } catch(error) {
       console.log(error.message);
     }
-    navigation.navigate("Home", {userid: userid})
   }
 
   return (

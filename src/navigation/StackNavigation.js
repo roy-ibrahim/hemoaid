@@ -8,6 +8,7 @@ import ViewBloodTestsScreen from "../Screens/ViewBloodTestsScreen";
 import { createStackNavigator } from "@react-navigation/stack";
 import HealthSummaryScreen from "../Screens/HealthSummaryScreen";
 import BloodTestResultScreen from "../Screens/BloodTestResultScreen";
+import AddBloodTestScreen from "../Screens/AddBloodTestScreen";
 
 const Stack = createStackNavigator();
 
@@ -68,6 +69,13 @@ const StackNavigation = () => {
         component={BloodTestResultScreen}
         options={{
           title: "Health summary",
+        }}
+      />
+      <Stack.Screen
+        name="AddBloodTestScreen"
+        component={AddBloodTestScreen}
+        options={{
+          title: "",
         }}
       />
     </Stack.Navigator>

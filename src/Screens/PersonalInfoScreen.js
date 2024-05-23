@@ -66,7 +66,7 @@ export default function SignupScreen({route}) {
         </View>
         <View
           style={{
-            width: "30%",
+            width: "28%",
             borderWidth: 2,
             height: 1,
             margin: 4,
@@ -90,7 +90,7 @@ export default function SignupScreen({route}) {
         </View>
         <View
           style={{
-            width: "30%",
+            width: "28%",
             borderWidth: 2,
             height: 1,
             margin: 4,
@@ -131,14 +131,12 @@ export default function SignupScreen({route}) {
         <Text style={{fontWeight: "bold"}}>Current Medications</Text>
       <TextInput
         placeholder="Medication 1, Medication 2, ..."
-        value={currentMedications}
         onChangeText={(text)=>setCurrentMedications(text)}
         style={{...styles.input, height: 150}}
       />
       <Text style={{fontWeight: "bold"}}>Past Operations</Text>
       <TextInput
         placeholder="Operation 1, Operation 2, ..."
-        value={pastOperations}
         onChangeText={(text)=>setPastOperations(text)}
         style={{...styles.input, height: 150}}
       />
